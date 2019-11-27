@@ -1,5 +1,5 @@
 DEBUG=0
-WANT_LIBCO = 1
+WANT_LIBCO = 0
 DISABLE_ERROR_LOGGING = 1
 #set later according to platform
 IS_X86 = 0
