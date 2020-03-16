@@ -290,16 +290,18 @@ else ifeq ($(platform), vita)
    TARGET := $(TARGET_NAME)_libretro_$(platform).a
    CC = arm-vita-eabi-gcc$(EXE_EXT)
    AR = arm-vita-eabi-ar$(EXE_EXT)
-   CFLAGS += -DVITA -mthumb
+   CFLAGS += -DVITA -marm
    CFLAGS += -mfloat-abi=hard -fsingle-precision-constant
    CFLAGS += -Wall -mword-relocations
    CFLAGS += -fomit-frame-pointer -ffast-math
    CFLAGS += -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables 
-   CFLAGS += -ftree-vectorize -funroll-loops
+   CFLAGS += -ftree-vectorize -funroll-loops -fno-optimize-sibling-calls
    HAVE_RZLIB := 1
    DISABLE_ERROR_LOGGING := 1
    ARM = 1
    STATIC_LINKING := 1
+   USE_CYCLONE = 1
+   USE_DRZ80 = 1
 
 # Emscripten
 else ifeq ($(platform), emscripten)
@@ -423,7 +425,7 @@ else ifneq (,$(findstring windows_msvc2017,$(platform)))
 	reg_query = $(call filter_out2,$(subst $2,,$(shell reg query "$2" -v "$1" 2>nul)))
 	fix_path = $(subst $(SPACE),\ ,$(subst \,/,$1))
 
-	ProgramFiles86w := $(shell cmd /c "echo %PROGRAMFILES(x86)%")
+	ProgramFiles86w := $(shell cmd //c "echo %PROGRAMFILES(x86)%")
 	ProgramFiles86 := $(shell cygpath "$(ProgramFiles86w)")
 
 	WindowsSdkDir ?= $(call reg_query,InstallationFolder,HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v10.0)
@@ -488,7 +490,7 @@ else ifneq (,$(findstring windows_msvc2017,$(platform)))
 # Windows
 else
    TARGET := $(TARGET_NAME)_libretro.dll
-   CC = gcc
+   CC ?= gcc
    SHARED := -shared -static-libgcc -static-libstdc++ -s -Wl,--version-script=link.T
    CFLAGS += -D__WIN32__ -D__WIN32_LIBRETRO__ -Wno-missing-field-initializers
    IS_X86 = 1
